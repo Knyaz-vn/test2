@@ -1,11 +1,13 @@
 # Marstek Energy Controller
 
-Local controller for Marstek Venus E 3.0.
+Controller for Marstek Venus E 3.0.
 
-Logic: day 50%, night tariff 100%, planned outage >=3h -> 80%. All thresholds are configurable.
+Confirmed device: Venus E 3.0, Control firmware v150, IP 192.168.31.96.
 
-Architecture: FastAPI web UI + local UDP Marstek Open API adapter + pluggable outage provider.
+For v150 the safe architecture is UDP Open API for read-only telemetry and Modbus TCP over Ethernet for writes/control. Venus E v3 exposes writable target SoC register 42011 and force mode register 42010. Do not use UDP ES.SetMode for automatic control until a firmware-specific write test is completed; community testing has reported Open API control writes wedging the UDP API on some Venus E v3 builds.
 
-First run with DRY_RUN=true. See .env.example.
+Logic: daytime 50%, night tariff 100%, planned outage >=3h -> 80%. Thresholds are configurable. Global automation ON/OFF. Local operation does not depend on cloud access.
 
-The official VinnytsiaOblEnergo outage page is the authoritative source for Vinnytsia schedules, but automated access can return HTTP 403, so the provider is deliberately isolated behind an adapter rather than hard-coded scraping.
+Safety: DRY_RUN=true by default. No control writes should be enabled until Modbus has been verified.
+
+The screenshot shows the station on Wi-Fi. For the safe control path connect Venus E 3.0 to Ethernet/LAN and expose TCP/502.
